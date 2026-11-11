@@ -1,12 +1,11 @@
-const CACHE_NAME = 'monzer-app-v162-cache';
+
+const CACHE_NAME = 'monzer-app-v16-cache';
 const urlsToCache = [
-  './',
   './index.html',
   './manifest.json'
 ];
 
 self.addEventListener('install', event => {
-  event.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
@@ -25,22 +24,18 @@ self.addEventListener('activate', event => {
           }
         })
       );
-    }).then(() => self.clients.claim())
+    })
   );
 });
 
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
-      .then(cachedResponse => {
-        if (cachedResponse) {
-          return cachedResponse;
+      .then(response => {
+        if (response) {
+          return response;
         }
-        return fetch(event.request).catch(() => {
-          if (event.request.mode === 'navigate' || (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html'))) {
-            return caches.match('./index.html') || caches.match('./');
-          }
-        });
+        return fetch(event.request);
       })
   );
 });
